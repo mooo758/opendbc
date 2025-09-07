@@ -15,7 +15,7 @@ TORQUE_TO_ANGLE_DEADZONE = 0.5  # This equates to hands-on level 1, so we don't 
 TORQUE_TO_ANGLE_CLIP = 10.  # Steering (usually) disengages at 2.5 Nm, this limit exists only in case the EPAS gives bad data
 CONTINUED_OVERRIDE_ANGLE = 10.  # The angle difference between OP and user to continue overriding steering (prevents oscillation)
 
-LOW_SPEED_ALLOWED = True
+LOW_SPEED_ALLOWED = False
 LOW_SPEED_THRESHOLD = 6.7  # ~15 MPH
 
 
