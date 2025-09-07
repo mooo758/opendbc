@@ -43,6 +43,11 @@ class CarInterface(CarInterfaceBase):
 
     stock_cp.enableBsm = True
 
+    ret.flags |= TeslaFlagsSP.VIRTUAL_TORQUE_BLENDING.value
+
+    if ret.flags & TeslaFlagsSP.VIRTUAL_TORQUE_BLENDING:
+      ret.safetyParam |= TeslaSafetyFlagsSP.VIRTUAL_TORQUE_BLENDING
+
     if 0x3DF in fingerprint[1]:
       ret.flags |= TeslaFlagsSP.HAS_VEHICLE_BUS.value
       ret.safetyParam |= TeslaSafetyFlagsSP.HAS_VEHICLE_BUS

@@ -2,6 +2,12 @@
 
 #include "opendbc/safety/safety_declarations.h"
 
+enum {
+  TESLA_PARAM_SP_VIRTUAL_TORQUE_BLENDING = 1,
+};
+
+static bool tesla_virtual_torque_blending;
+
 #define TESLA_COMMON_RX_CHECKS \
   {.msg = {{0x2b9, 2, 8, 25U, .max_counter = 7U, .ignore_quality_flag = true}, { 0 }, { 0 }}},    /* DAS_control */                                  \
   {.msg = {{0x488, 2, 4, 50U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},   /* DAS_steeringControl */                          \
@@ -123,7 +129,8 @@ static void tesla_rx_hook(const CANPacket_t *msg) {
       const int eac_error_code = msg->data[2] >> 4;  // EPAS3S_eacErrorCode
 
       // Disengage on normal user override, or if high angle rate fault from user overriding extremely quickly
-      steering_disengage = (hands_on_level >= 3) || ((eac_status == 0) && (eac_error_code == 9));
+      const bool hands_on_level_check = (!tesla_virtual_torque_blending && (hands_on_level >= 3));
+      steering_disengage = hands_on_level_check || ((eac_status == 0) && (eac_error_code == 9));
     }
 
     // Vehicle speed (DI_speed)
@@ -356,6 +363,8 @@ static safety_config tesla_init(uint16_t param) {
   const int TESLA_FLAG_LONGITUDINAL_CONTROL = 1;
   tesla_longitudinal = GET_FLAG(param, TESLA_FLAG_LONGITUDINAL_CONTROL);
 #endif
+
+  tesla_virtual_torque_blending = GET_FLAG(current_safety_param_sp, TESLA_PARAM_SP_VIRTUAL_TORQUE_BLENDING);
 
   const int TESLA_PARAM_SP_VEHICLE_BUS = 1;
 

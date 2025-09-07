@@ -5,15 +5,18 @@ from opendbc.car.common.conversions import Conversions as CV
 from opendbc.car.interfaces import CarStateBase
 from opendbc.car.tesla.values import DBC, CANBUS, GEAR_MAP, STEER_THRESHOLD, CAR
 
+from opendbc.sunnypilot.car.tesla.virtual_torque_blending import TorqueBlendingCarState
+
 from opendbc.sunnypilot.car.tesla.carstate_ext import CarStateExt
 
 ButtonType = structs.CarState.ButtonEvent.Type
 
 
-class CarState(CarStateBase, CarStateExt):
+class CarState(CarStateBase, CarStateExt, TorqueBlendingCarState):
   def __init__(self, CP, CP_SP):
     CarStateBase.__init__(self, CP, CP_SP)
     CarStateExt.__init__(self, CP, CP_SP)
+    TorqueBlendingCarState.__init__(self)
     self.can_define = CANDefine(DBC[CP.carFingerprint][Bus.party])
     self.shifter_values = self.can_define.dv["DI_systemStatus"]["DI_gear"]
 
@@ -122,6 +125,8 @@ class CarState(CarStateBase, CarStateExt):
     self.das_control = copy.copy(cp_ap_party.vl["DAS_control"])
 
     CarStateExt.update(self, ret, can_parsers)
+
+    TorqueBlendingCarState.update_torque_blending(self, ret, eac_status, eac_error_code)
 
     return ret, ret_sp
 
