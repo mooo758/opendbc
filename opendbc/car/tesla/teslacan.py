@@ -30,7 +30,7 @@ class TeslaCAN:
 
   def create_longitudinal_command(self, acc_state, accel, counter, v_ego, active):
 
-    set_speed = max((v_ego + accel) * CV.MS_TO_KPH, 0) # add accel offset
+    set_speed = max((v_ego + (accel if active else 0)) * CV.MS_TO_KPH, 0) # add accel offset
 
     values = {
       "DAS_setSpeed": set_speed,
