@@ -35,7 +35,14 @@ class CarController(CarControllerBase):
     # Tesla EPS enforces disabling steering on heavy lateral override force.
     # When enabling in a tight curve, we wait until user reduces steering force to start steering.
     # Canceling is done on rising edge and is handled generically with CC.cruiseControl.cancel
+
+    # Check if we're in MADS lateral-only mode
+    mads_lat_only = CC_SP and hasattr(CC_SP, 'mads') and CC_SP.mads.active and not CC.longActive
+
     lat_active = CC.latActive and CS.hands_on_level < 3
+    # Allow steering in MADS lateral-only mode even if longActive is False
+    if mads_lat_only and CC.latActive:
+        lat_active = CC.latActive and CS.hands_on_level < 3  # 保持正常逻辑
 
     if self.frame % CarControllerParams.STEER_STEP == 0:
       # Before 2024, model 3 had a constant steering rack ratio in respect to the steering angle.
