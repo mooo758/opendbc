@@ -32,6 +32,9 @@ class TeslaCAN:
 
     set_speed = max((v_ego + (accel if active else 1)) * CV.MS_TO_KPH, 0) # add accel offset
 
+    if not active:
+      accel = max(accel, 0)
+
     values = {
       "DAS_setSpeed": set_speed,
       "DAS_accState": acc_state,
