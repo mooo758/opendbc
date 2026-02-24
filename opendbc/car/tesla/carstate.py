@@ -28,6 +28,7 @@ class CarState(CarStateBase, CarStateExt):
 
     self.hands_on_level = 0
     self.das_control = None
+    self.gas_pedal = 0.0
 
   def update_summon_state(self, summon_state: str, cruise_enabled: bool):
     summon_now = summon_state in ("ACTIVE", "COMPLETE", "SELFPARK_STARTED")
@@ -56,7 +57,8 @@ class CarState(CarStateBase, CarStateExt):
       ret.vEgoCluster = cp_party.vl["DI_speed"]["DI_uiSpeed"] * CV.MPH_TO_MS
 
     # Gas pedal
-    ret.gasPressed = cp_party.vl["DI_systemStatus"]["DI_accelPedalPos"] > 0
+    self.gas_pedal = min(cp_party.vl["DI_systemStatus"]["DI_accelPedalPos"], 100) / 100.0
+    ret.gasPressed = self.gas_pedal > 0
 
     # Brake pedal
     ret.brake = 0
